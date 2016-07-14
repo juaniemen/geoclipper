@@ -1,0 +1,45 @@
+ <% if !(dataArray.nil?) %>
+      <% dataArray.each do |arrayObj| %>
+          <div class="list-group-item pull" id="<%= nodeId %>">
+            <span class="pull-right">
+              <a class="closeSelectedNode" href="#">×<input type="hidden" name="nodeId" value="<%= nodeId %>" /></a>
+            </span>
+            <h3><%= arrayObj["table"] %></h3>
+            <% if (arrayObj["properties"] != nil) %>
+            <p> <%= (arrayObj["properties"]).to_sentence %></p>
+            <% end  %>
+          </div>
+      <% end %>
+  <% end %>
+
+<script>
+  $(document).ready(function(){
+  $('.closeSelectedNode').click(function () {
+    console.log(<%= nodeId.to_i %>);
+    nodeToDeleteSelect = $(this).children("input:first").val();
+    for(n=0; n<nodesToClip.length; n++){
+      if(nodesToClip['nodeId'] == nodeToDeleteSelect){
+        nodesToClip.remove(n);
+      }
+    }
+//    longitudClip = nodesToClip.length
+//    if(longitudClip  >= 1){
+//      revelaClean();
+//      if(longitudClip >= 2){
+//        revelaClip();
+//      }else{
+//        ocultaClip();
+//      }
+//    }else{
+//      ocultaClean();
+//      ocultaClip();
+//    }
+
+    $('#clipView').find('#tree').treeview('enableNode', <%= nodeId %>, {silent: true});
+//    index = tablesToClip.indexOf($(this))
+//    tablesToClip.remove(index);
+    $(this).parent().parent().parent().empty();
+  })
+
+  });
+</script>

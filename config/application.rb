@@ -8,6 +8,7 @@ Bundler.require(*Rails.groups)
 
 module Geoclipper
   class Application < Rails::Application
+    config.autoload_paths += Dir["#{config.root}/lib/**/"]
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.
@@ -22,5 +23,13 @@ module Geoclipper
 
     # Do not swallow errors in after_commit/after_rollback callbacks.
     config.active_record.raise_in_transactional_callbacks = true
+
+
+    # tell the I18n library where to find your translations
+    config.i18n.load_path += Dir[Rails.root.join('lib', 'locale', '*.{rb,yml}')]
+
+    # set default locale to something other than :en
+    config.i18n.default_locale = :es
+
   end
 end

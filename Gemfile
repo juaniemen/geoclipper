@@ -11,16 +11,46 @@ gem 'sass-rails', '~> 5.0'
 gem 'uglifier', '>= 1.3.0'
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.1.0'
-# See https://github.com/rails/execjs#readme for more supported runtimes
-# gem 'therubyracer', platforms: :ruby
 
+gem 'font-awesome-rails'
 
+# Gema para la gestion de archivos - upload ...
+gem 'carrierwave'
+
+gem 'therubyracer', platforms: :ruby
 
 # Conexión con PostGIS
-gem 'activerecord-postgis-adapter', '~> 4.0.0.beta'
+gem 'activerecord-postgis-adapter'
+
+gem 'walk'
+
+# Bootstrap
+gem 'bootstrap-sass', '~> 3.1.1'
+
+# Gema para el slider del index
+gem 'jquery-slick-rails'
+
+gem 'rails-i18n'
+gem 'bootstrap-wysihtml5-rails'
+
+
+# twitter bootstrap css & javascript toolkit
+gem 'twitter-bootswatch-rails', '~> 3.3.4'
+
+# twitter bootstrap helpers gem, e.g., alerts etc...
+gem 'twitter-bootswatch-rails-helpers'
+
+# Ploteo de mapas y capas
+gem 'openlayers-rails'
+
 
 # Use jquery as the JavaScript library
 gem 'jquery-rails'
+gem 'bootstrap-datepicker-rails'
+
+# Style to input-output files  http://markusslima.github.io/bootstrap-filestyle/
+gem 'bootstrap-filestyle-rails'
+
 # Turbolinks makes following links in your web application faster. Read more: https://github.com/rails/turbolinks
 gem 'turbolinks'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder

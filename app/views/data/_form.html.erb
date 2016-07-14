@@ -1,0 +1,45 @@
+<%= form_for @uploader, :url => url_for(:controller => 'data', :action => 'create'), html: { multipart: true, class: "horizontal"} do  |f| %>
+    <% if @uploader.errors.any? %>
+        <div id="error_explanation" class="alert alert-warning">
+          <ul>
+            <% @uploader.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+    <% end %>
+    <br>
+    <div class="field">
+      <%= f.label :datum %><br>
+      <%= f.text_field :datum, class: "form-control" %>
+    </div>
+    <br>
+    <div class="field">
+      <%= f.label :temporality %><br>
+      <div class='input-group date controls' id='datepickerMonth' data-date-format="mm-yyyy">
+        <%= f.text_field :temporality, class: "form-control", placeholder: "mm-yyyy"  %>
+
+        <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
+                </span>
+      </div>
+    </div>
+    <br>
+    <div class="field">
+      <%= f.label :shp %><br>
+      <%= f.file_field :shp, class: "form-control", class: "fileInput" %>
+    </div>
+    <br>
+    <div class="field">
+      <%= f.label :dbf %><br>
+      <%= f.file_field :dbf, class: "fileInput"  %>
+    </div>
+    <br>
+    <div class="field">
+      <%= f.label :shx %><br>
+      <%= f.file_field :shx, class: "fileInput"  %>
+    </div>
+    <br>
+    <div class="actions">
+      <%= f.submit class: "submit"%>
+    </div>
+<% end %>

@@ -1,0 +1,31 @@
+<form id="formAttrTable" action="" method="post" onsubmit="createList(this);">
+  <h2><%= table_name %></h2>
+  <input type="hidden" name="table" value="<%= table_name %>">
+  <div class="form-group">
+    <table class="table">
+      <tbody>
+      <% var = 0; %>
+      <tr>
+        <% columns.each do |column| %>
+            <% if (var%3 == 0) %>
+                </tr>
+                <tr>
+            <% end %>
+            <td>
+              <label for="<%= column %>"><%= column %>: </label>
+              <input type="checkbox" name="properties" value="<%= column %>">
+            </td>
+
+            <% var += 1 %>
+        <% end %>
+        </tr>
+
+        </tbody>
+    </table>
+  </div>
+  <input type="submit" class="btn btn-default" data-dismiss="modal"/>
+</form>
+<pre id="result" class="hidden">
+
+</pre>
+
