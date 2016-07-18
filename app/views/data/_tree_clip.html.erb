@@ -3,12 +3,12 @@
   $(document).ready(function () {
 // Some logic to retrieve, or generate tree structure
     var tree = <%= raw @tree_view.to_json %>;
-    var selectedNode;
     var idPath;
     var dataParaSelect;
     var htmlResponse;
     var nodeAux;
-    var nodesToClip = new Array();
+    var selectToDelete;
+//    var nodesToClip = new Array();
 
     function scan(obj) {
       var k = 'text';
@@ -42,7 +42,7 @@
     a;
 
     $('#tree').on('nodeSelected', function (event, data) {
-      selectedNode = data['nodeId'].toString();
+      console.log(data);
       nodeAux = data['nodeId'];
       idPath = getPathNode();
       cargaAtributos();
@@ -89,6 +89,20 @@
       return o;
     };
 
+    function ocultaRevelaBotones(){
+      if(longitudClip  >= 1){
+        $('#clearListSelected').show()
+        if(longitudClip >= 2){
+          $('#clipNow').show();
+        }else{
+          $('#clipNow').hide();
+        }
+      }else{
+        $('#clearListSelected').hide();
+        $('#clipNow').hide();
+      }
+    };
+
     function printeaListToClip(dataArray) {
       dataArrayFinal = JSON.stringify(dataArray);
       console.log('Mando printea List')
@@ -96,24 +110,15 @@
       $.ajax({
         type: "POST",
         url: url,
-        data: {dataArray: dataArrayFinal, nodeId: nodeAux},
+        data: {dataArray: dataArrayFinal, nodeId: selectToDelete},
         success: function (data) {
           console.log('Los datos vienen de vuelta' + data.toString());
           $('#listSelected').append(data['data']['htmlResponse']);
-          nodesToClip.push = {dataArray: dataArray, nodeId: nodeAux};
+          nodesToClip.push({dataArray: dataArray, nodeId: selectToDelete});
           nodeAux = null;
-//          longitudClip = nodesToClip.length;
-//          if(longitudClip  >= 1){
-//            revelaClean();
-//            if(longitudClip >= 2){
-//              revelaClip();
-//            }else{
-//              ocultaClip();
-//            }
-//          }else{
-//            ocultaClean();
-//            ocultaClip();
-//          }
+          longitudClip = nodesToClip.length
+          ocultaRevelaBotones();
+
         },
         dataType: 'json'
       });
@@ -130,12 +135,12 @@
     };
 
     $('#modalForm').on('hide.bs.modal', function () {
-      nodeFinal = nodeAux;
+      selectToDelete = nodeAux;
       createListCrea();
 
 
       // Conjunto de nodos que cumplen el patrón, se espera solo 1
-      $('#tree').treeview('disableNode', nodeFinal, {silent: true});
+      $('#tree').treeview('disableNode', selectToDelete, {silent: true});
       $('#tree').treeview('unselectNode', [nodeAux, {silent: true}]);
       nodeAux = null;
     });
@@ -144,9 +149,67 @@
       $('#listSelected').empty();
       nodesToClip = new Array();
       nodeAux = null;
-      selectedNode = null;
+      $('#clearListSelected').hide();
+      $('#clipNow').hide();
       $('#tree').treeview('enableAll', { silent: true });
 
+    });
+
+    function gestionaSubmit(datos){
+      if(status == 'duplicatedTable') {
+        var dialogInstance = new BootstrapDialog();
+        dialogInstance.setTitle('ERROR');
+        dialogInstance.setMessage(datos['message']);
+        dialogInstance.setType(BootstrapDialog.TYPE_DANGER);
+        dialogInstance.open();
+      }else if(status == 'cannotClip'){
+        var dialogInstance = new BootstrapDialog();
+        dialogInstance.setTitle('ERROR');
+        dialogInstance.setMessage(datos['message']);
+        dialogInstance.setType(BootstrapDialog.TYPE_DANGER);
+        dialogInstance.open();
+      }else if(status == 'blankClip'){
+        var dialogInstance = new BootstrapDialog();
+        dialogInstance.setTitle('ERROR');
+        dialogInstance.setMessage(datos['message']);
+        dialogInstance.setType(BootstrapDialog.TYPE_WARNING);
+        dialogInstance.open();
+      }else if('successClip'){
+        console.log(datos);
+        idPath = datos['table'];
+        $('#content').prepend(datos['modal'])
+        loadMap(datos['data']);
+        $('#listSelected').empty();
+        $('#layerName').attr("value", "");
+        nodesToClip = new Array();
+        nodeAux = null;
+        $('#clearListSelected').hide();
+        $('#clipNow').hide();
+        $('#tree').treeview('enableAll', { silent: true });
+        $('#mapModal').modal('show')
+
+      }
+    }
+    $('#clipNow').on('click', function () {
+      datosParaSubmit = [];
+      nodesToClip.forEach(function(n){
+        datosParaSubmit.push(n['dataArray']);
+      });
+      url = '/data/clipNow';
+      $.ajax({
+        type: "POST",
+        url: url,
+        data: {clipData: datosParaSubmit, layerName: $('#layerName').val()},
+        success: function (data) {
+          $('#listSelected').empty();
+          nodesToClip = new Array();
+          nodeAux = null;
+          gestionaSubmit(data);
+        },
+        error: function (data) {
+          alert('No se ha podido clipear')
+        }
+      });
     });
 
 
@@ -163,14 +226,13 @@
 //      };
 //    }
 
-    $('#modalForm').on('hidden.bs.modal', function () {
+    $('#modalForm').on('hide.bs.modal', function () {
       $('#formSelectTable').empty();
-      selectedNode = null;
       nodeAux = null;
     });
 
     function getPathNode() {
-      node = $('#tree').treeview('getNode', selectedNode);
+      node = $('#tree').treeview('getNode', nodeAux);
       resultAux = getPathNodeAux(node, '');
       return resultAux.substr(0, resultAux.length - 1);
     };
@@ -184,6 +246,40 @@
         return getPathNodeAux(node1, pathNode1);
       }
     }
+
+
+    function loadMap(datos) {
+
+      var map = new ol.Map({
+        target: 'map',
+        layers: [
+          new ol.layer.Tile({
+            source:  new ol.source.OSM({})
+          })
+        ],
+        view: new ol.View({
+          center: ol.proj.fromLonLat([37.41, 8.82]),
+          zoom: 4
+        })
+      });
+
+    };
+
+    $('#mapModal').on('show.bs.modal', function () {
+      loadMap();
+      $('#nodePath').append(idPath)
+      link = "/data/downloadShp/" + idPath
+      $('#linkToDownloadShp').attr("href", link)
+
+    });
+
+    $('#mapModal').on('hide.bs.modal', function () {
+
+
+      $('#map').empty();
+      $('#nodePath').empty();
+
+    });
 
 
   });

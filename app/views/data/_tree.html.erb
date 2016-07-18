@@ -94,28 +94,29 @@
         })
       });
 
-      map.zoomToMaxExtent();
     };
 
 
-//    function llamadaAsynGeoJson() {
-//      url = '/data/jsonToMap/' + idPath
-//      $.get('url'), {
-//        data: {format: 'json'},
-//        success: function (data) {
-//          data1 = data;
-//          loadMap(data);
-//          alert('Me ha llegado')
-//        },
-//        error: function () {
-//          alert('No se pudo cargar el mapa')
-//        }
-//      };
-//
-//    }
+    function llamadaAsynGeoJson() {
+      url = '/data/jsonToMap/' + idPath
+      $.get('url'), {
+        data: {format: 'json'},
+        success: function (datos) {
+          loadMap(datos);
+          alert('Me ha llegado')
+        },
+        error: function () {
+          alert('No se pudo cargar el mapa')
+        }
+      };
 
-    $('#mapModal').on('shown.bs.modal', function () {
+    }
+
+    $('#mapModal').on('show.bs.modal', function () {
       loadMap();
+      $('#nodePath').append(idPath)
+      linkOf = "/data/downloadShp/" + idPath
+      $('#linkToDownloadShp').attr("href", linkOf)
 //      llamadaAsynGeoJson();
 
 
@@ -125,6 +126,7 @@
 
 
       $('#map').empty();
+      $('#nodePath').empty();
       $('#tree').treeview('unselectNode', [nodeAux, {silent: false}]);
       selectedNode = null;
       nodeAux = null;

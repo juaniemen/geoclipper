@@ -1,4 +1,7 @@
 class DataController < ApplicationController
+    include DataHelper
+    include Clipper
+    include PG
   before_action :connection_establishment
 
   def load
@@ -85,6 +88,7 @@ class DataController < ApplicationController
   end
 
 
+
   def jsonToMap
     shp_name1 = params['shp_name']
     config = Rails.configuration.database_configuration
@@ -131,14 +135,14 @@ class DataController < ApplicationController
     columns = []
     fetching.values.each do |column|
       if column[0] != 'geom' && !column[0].starts_with?('gid')
-      columns.append(column[0])
+        columns.append(column[0])
       end
     end
     respond_to do |format|
       format.json { render json: {status: :success,
                                   message: ":))))",
-                                  data: {id: table_name, columns: columns, htmlResponse: (render_to_string partial: '/data/populateForm', locals: {columns: columns, table_name: table_name}, layout: false, formats: :html )},
-                                  }
+                                  data: {id: table_name, columns: columns, htmlResponse: (render_to_string partial: '/data/populateForm', locals: {columns: columns, table_name: table_name}, layout: false, formats: :html)},
+      }
       }
     end
   end
@@ -150,13 +154,83 @@ class DataController < ApplicationController
     respond_to do |format|
       format.json { render json: {status: :success,
                                   message: ":))))",
-                                  data: {htmlResponse: (render_to_string partial: '/data/list_to_clip', locals: {dataArray: dataArray1, nodeId: nodeId}, layout: false, formats: :html )},
+                                  data: {htmlResponse: (render_to_string partial: '/data/list_to_clip', locals: {dataArray: dataArray1, nodeId: nodeId}, layout: false, formats: :html)},
       }
       }
     end
   end
 
-end
+  def clipNow
+    dataAux = params['clipData']
+    name = params['layerName']
+    existsTableBefore = exists_table_by_name?(name)
+    if(!existsTableBefore)
+    # Los datos no vienen como array si no como un hash cuyos indices son los números de un array lógico
+    data = Array.new()
+    dataAux.each do |k, v|
+      data.push(v)
+    end
+    arrayProperties = []
+    data.each do |dataArray|
+      arrayProperties.push(dataArray['properties'])
+    end
+    arrayProperties.flatten!
+    # arrayToClip -> Contendra table, properties y properties_as por lo tanto borramos nodeId y meteremos properties_as
+    arrayToClip = Array.new(data)
+    arrayToClip.map { |n| n['properties_as'] = n['properties'].clone } # Modificado a [{table: x, properties: y, properties_as: y }]
+
+    counts = Hash.new(0)
+    arrayProperties.map! { |val| counts[val]+=1 }
+    arrayRepetidos = counts.reject { |val, count| count==1 }.keys
+    if (arrayRepetidos.length != 0)
+      arrayToClip.map do |table1|
+        table = table1['table']
+        properties = table1['properties']
+        properties_as = table1['properties_as']
+        properties_as.map! do |prop_as|
+          if (arrayRepetidos.include?(prop_as))
+            prop_as = table + '_' + prop_as
+          else
+            prop_as = prop_as
+          end
+        end
+      end
+    end
+    arrayToClip.map!{|n| n.to_unsafe_h}
+    listaTablas = []
+    arrayToClip.map do |tablas|
+      listaTablas.push(tablas['table'])
+    end
+    begin
+    clipper_now(listaTablas, name, @conn)
+    rescue PG::Error => error
+    l = true
+      p error
+    end
+
+    load_tables(name, arrayToClip, @conn)
+    puts 'Ha salido del load, a ver que tal'
+
+    existsTableAfter = exists_table_by_name?(name)
+
+    end
+      if(existsTableBefore)
+        finalResponse = {status: 'duplicatedTable', message: "Ya existe una tabla con ese nombre"}
+      elsif((existsTableBefore && !existsTableAfter) || l)
+        finalResponse = {status: 'databaseError', message: "Ha habido un error con la base de datos. Contacte con el administrador"}
+      elsif(blankTable?(name))
+        finalResponse = {status: 'blankTable', message: "La tabla resultante está vacía"}
+      elsif(existsTableAfter)
+        finalResponse = {status: 'successClip', message: "La nueva capa ha sido generada correctamente", data: jsonToMapHelped(name), modal: (render_to_string partial: '/data/modal'), table: name}
+        end
+
+      respond_to do |format|
+      format.json { render json: finalResponse}
+      end
+
+    end
+  end
+
 
 
 

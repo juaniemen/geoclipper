@@ -1,26 +1,4 @@
 <script> var nodesToClip = new Array();
-$(document).ready(function(){
-  function ocultaClip(){
-  $('#clipNow').hide();
-
-};
-
-function ocultaClean(){
-  $('#clearListSelected').hide();
-
-}
-
-function revelaClean(){
-  $('#clearListSelected').show();
-
-}
-
-function revelaClip(){
-  $('#clipNow').show();
-
-}
-
-})
 
 </script>
 <!-- es como el root scope -->
@@ -33,8 +11,9 @@ function revelaClip(){
   </div>
 </div>
 <div id="tree_listSelected" class="col-sm-6 col-md-6 pull-right">
+  <label class="control-label">Nombre de la nueva capa</label>
+  <input class="form-control" id="layerName" type="text">
   <div class="list-group" id="listSelected">
-
 
   </div>
 </div>
@@ -51,3 +30,8 @@ function revelaClip(){
   </div>
 
 </div>
+<script>
+
+  $('#clipNow').hide();
+  $('#clearListSelected').hide();
+</script>

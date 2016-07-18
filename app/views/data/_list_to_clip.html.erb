@@ -1,45 +1,47 @@
- <% if !(dataArray.nil?) %>
-      <% dataArray.each do |arrayObj| %>
-          <div class="list-group-item pull" id="<%= nodeId %>">
+<% if !(dataArray.nil?) %>
+    <% dataArray.each do |arrayObj| %>
+        <div class="list-group-item pull" id="<%= nodeId %>">
             <span class="pull-right">
-              <a class="closeSelectedNode" href="#">×<input type="hidden" name="nodeId" value="<%= nodeId %>" /></a>
+              <a class="closeSelectedNode" href="#">×<input type="hidden" name="nodeId" value="<%= nodeId %>"/></a>
             </span>
-            <h3><%= arrayObj["table"] %></h3>
-            <% if (arrayObj["properties"] != nil) %>
-            <p> <%= (arrayObj["properties"]).to_sentence %></p>
-            <% end  %>
-          </div>
-      <% end %>
-  <% end %>
-
+          <h3><%= arrayObj["table"] %></h3>
+          <% if (arrayObj["properties"] != nil && arrayObj["properties"].length >1) %>
+              <p> <%= (arrayObj["properties"]).to_sentence %></p>
+          <% elsif (arrayObj["properties"] != nil) %>
+              <p> <%= (arrayObj["properties"]).to_s %></p>
+          <% end %>
+        </div>
+    <% end %>
+<% end %>
 <script>
-  $(document).ready(function(){
-  $('.closeSelectedNode').click(function () {
-    console.log(<%= nodeId.to_i %>);
-    nodeToDeleteSelect = $(this).children("input:first").val();
-    for(n=0; n<nodesToClip.length; n++){
-      if(nodesToClip['nodeId'] == nodeToDeleteSelect){
-        nodesToClip.remove(n);
+  $(document).ready(function () {
+    $('.closeSelectedNode').click(function () {
+      console.log(<%= nodeId.to_i %>);
+      nodeToDeleteSelect = <%= nodeId %>;
+      for (n = 0; n < nodesToClip.length; n++) {
+        if (nodesToClip[n].nodeId == nodeToDeleteSelect) {
+          nodesToClip.splice(n, 1);
+        }
       }
-    }
-//    longitudClip = nodesToClip.length
-//    if(longitudClip  >= 1){
-//      revelaClean();
-//      if(longitudClip >= 2){
-//        revelaClip();
-//      }else{
-//        ocultaClip();
-//      }
-//    }else{
-//      ocultaClean();
-//      ocultaClip();
-//    }
+      longitudClip = nodesToClip.length
+      if (longitudClip >= 1) {
+        $('#clearListSelected').show();
+        if (longitudClip >= 2) {
+          $('#clipNow').show();
+        } else {
+          $('#clipNow').hide();
+        }
+      } else {
+        $('#clearListSelected').hide();
+        $('#clipNow').hide();
+      }
+      ;
 
-    $('#clipView').find('#tree').treeview('enableNode', <%= nodeId %>, {silent: true});
-//    index = tablesToClip.indexOf($(this))
-//    tablesToClip.remove(index);
-    $(this).parent().parent().parent().empty();
-  })
+      $('#clipView').find('#tree').treeview('enableNode', <%= nodeId %>, {silent: true});
+      //    index = tablesToClip.indexOf($(this))
+      //    tablesToClip.remove(index);
+      $(this).parent().parent().remove();
+    })
 
   });
 </script>

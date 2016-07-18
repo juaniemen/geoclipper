@@ -15,7 +15,6 @@ $(document).ready(function(){
         placeholder: "No se ha cargado ningún archivo",
         buttonText: "Cargar archivo"
     })
-
     
 
 
