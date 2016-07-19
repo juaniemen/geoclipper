@@ -1,7 +1,9 @@
+require 'fileutils'
+
 class DataController < ApplicationController
-    include DataHelper
-    include Clipper
-    include PG
+  include DataHelper
+  include Clipper
+  include PG
   before_action :connection_establishment
 
   def load
@@ -26,8 +28,8 @@ class DataController < ApplicationController
       @uploader.save
       if @uploader.errors.blank? && exists_table?
         flash.alert = nil
-        @conn.exec(%Q(ALTER #{@tree_view.shp_name} ADD COLUMN temporal_context DATE;
-            UPDATE #{tree_view.shp_name} SET temporal_context = to_date('#{@tree_view.temporality}', 'mm-yyyy');))
+        @conn.exec(%Q[ALTER TABLE #{@uploader.shp_name} ADD COLUMN temporal_context DATE;
+            UPDATE #{@uploader.shp_name} SET temporal_context = to_date('#{@uploader.temporality}', 'mm-yyyy');])
         flash.notice = "SUCCESS: Los datos se han cargado correctamente"
         @uploader.clean_form_uploder_directory
       elsif @uploader.errors.blank?
@@ -86,7 +88,6 @@ class DataController < ApplicationController
     result
 
   end
-
 
 
   def jsonToMap
@@ -163,73 +164,105 @@ class DataController < ApplicationController
   def clipNow
     dataAux = params['clipData']
     name = params['layerName']
-    existsTableBefore = exists_table_by_name?(name)
-    if(!existsTableBefore)
-    # Los datos no vienen como array si no como un hash cuyos indices son los números de un array lógico
-    data = Array.new()
-    dataAux.each do |k, v|
-      data.push(v)
-    end
-    arrayProperties = []
-    data.each do |dataArray|
-      arrayProperties.push(dataArray['properties'])
-    end
-    arrayProperties.flatten!
-    # arrayToClip -> Contendra table, properties y properties_as por lo tanto borramos nodeId y meteremos properties_as
-    arrayToClip = Array.new(data)
-    arrayToClip.map { |n| n['properties_as'] = n['properties'].clone } # Modificado a [{table: x, properties: y, properties_as: y }]
+    name.downcase!
 
-    counts = Hash.new(0)
-    arrayProperties.map! { |val| counts[val]+=1 }
-    arrayRepetidos = counts.reject { |val, count| count==1 }.keys
-    if (arrayRepetidos.length != 0)
-      arrayToClip.map do |table1|
-        table = table1['table']
-        properties = table1['properties']
-        properties_as = table1['properties_as']
-        properties_as.map! do |prop_as|
-          if (arrayRepetidos.include?(prop_as))
-            prop_as = table + '_' + prop_as
-          else
-            prop_as = prop_as
+    existsTableBefore = exists_table_by_name?(name)
+    if (!existsTableBefore)
+      # Los datos no vienen como array si no como un hash cuyos indices son los números de un array lógico
+      data = Array.new()
+      dataAux.each do |k, v|
+        data.push(v)
+      end
+      arrayProperties = []
+      data.each do |dataArray|
+        arrayProperties.push(dataArray['properties'])
+      end
+      arrayProperties.flatten!
+      # arrayToClip -> Contendra table, properties y properties_as por lo tanto borramos nodeId y meteremos properties_as
+      arrayToClip = Array.new(data)
+      arrayToClip.map { |n| n['properties_as'] = n['properties'].clone } # Modificado a [{table: x, properties: y, properties_as: y }]
+
+      counts = Hash.new(0)
+      arrayProperties.map! { |val| counts[val]+=1 }
+      arrayRepetidos = counts.reject { |val, count| count==1 }.keys
+      if (arrayRepetidos.length != 0)
+        arrayToClip.map do |table1|
+          table = table1['table']
+          properties = table1['properties']
+          properties_as = table1['properties_as']
+          properties_as.map! do |prop_as|
+            if (arrayRepetidos.include?(prop_as))
+              prop_as = table + '_' + prop_as
+            else
+              prop_as = prop_as
+            end
           end
         end
       end
-    end
-    arrayToClip.map!{|n| n.to_unsafe_h}
-    listaTablas = []
-    arrayToClip.map do |tablas|
-      listaTablas.push(tablas['table'])
-    end
-    begin
-    clipper_now(listaTablas, name, @conn)
-    rescue PG::Error => error
-    l = true
-      p error
-    end
+      arrayToClip.map! { |n| n.to_unsafe_h }
+      listaTablas = []
+      arrayToClip.map do |tablas|
+        listaTablas.push(tablas['table'])
+      end
+      # Estas 2 variables las usamos para hacer permutaciones si no salen los clip.
+      errorDataB = false
+      permutListTablas = listaTablas.permutation.to_a
+      (0...permutListTablas.length).each do |index|
+        begin
+          clipper_now(permutListTablas[index], name, @conn)
 
-    load_tables(name, arrayToClip, @conn)
-    puts 'Ha salido del load, a ver que tal'
-
-    existsTableAfter = exists_table_by_name?(name)
-
-    end
-      if(existsTableBefore)
-        finalResponse = {status: 'duplicatedTable', message: "Ya existe una tabla con ese nombre"}
-      elsif((existsTableBefore && !existsTableAfter) || l)
-        finalResponse = {status: 'databaseError', message: "Ha habido un error con la base de datos. Contacte con el administrador"}
-      elsif(blankTable?(name))
-        finalResponse = {status: 'blankTable', message: "La tabla resultante está vacía"}
-      elsif(existsTableAfter)
-        finalResponse = {status: 'successClip', message: "La nueva capa ha sido generada correctamente", data: jsonToMapHelped(name), modal: (render_to_string partial: '/data/modal'), table: name}
+          # Si no ha habido error ha llegado hasta aqui
+          break
+        rescue PG::Error => error
+          # Si ha habido error intenta con la siguiente
+          errorDataB = true
+          borra_intermedias(@conn)
+          p error
         end
-
-      respond_to do |format|
-      format.json { render json: finalResponse}
       end
 
+      load_tables(name, arrayToClip, @conn)
+      puts 'Ha salido del load, a ver que tal'
+
+      existsTableAfter = exists_table_by_name?(name)
+
     end
+    if (existsTableBefore)
+      finalResponse = {status: 'duplicatedTable', message: "Ya existe una tabla con ese nombre"}
+    elsif ((existsTableBefore && !existsTableAfter) || errorDataB)
+      finalResponse = {status: 'databaseError', message: "Ha habido un error con la base de datos. Contacte con el administrador"}
+    elsif (blankTable?(name))
+      finalResponse = {status: 'blankTable', message: "La tabla resultante está vacía"}
+    elsif (existsTableAfter)
+      finalResponse = {status: 'successClip', message: "La nueva capa ha sido generada correctamente", data: jsonToMapHelped(name), modal: (render_to_string partial: '/data/modal'), table: name}
+    end
+
+    respond_to do |format|
+      format.json { render json: finalResponse }
+    end
+
   end
+
+  def downloadShp
+    name = params['name']
+    config = Rails.configuration.database_configuration
+    host = config[Rails.env]["host"]
+    database = config[Rails.env]["database"]
+    username = config[Rails.env]["username"]
+    password = config[Rails.env]["password"]
+
+
+    dirname = "#{Rails.public_path}/shp_to_download/#{name}"
+    if !File.directory?(dirname)
+      FileUtils.mkdir_p(dirname)
+    else
+      FileUtils.rm_rf("#{dirname}/.", secure: true)
+    end
+
+    `pgsql2shp -f #{Rails.public_path}/shp_to_download/#{name}/#{name}.shp -h #{host} -u #{username} -P #{password} #{database} "SELECT * FROM #{name};"`
+    createAndSendZip(name)
+  end
+end
 
 
 

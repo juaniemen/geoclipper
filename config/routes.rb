@@ -10,7 +10,7 @@ Rails.application.routes.draw do
   post 'data/tables', to: 'data#tables'
   post 'data/listToClip', to: 'data#listToClip'
   post 'data/clipNow', to: 'data#clipNow'
-  post 'data/downloadShp/:name', to: 'data#downloadShp'
+  get 'data/downloadShp/:name', to: 'data#downloadShp'
 
   #############################
   # Rutas para error_controller

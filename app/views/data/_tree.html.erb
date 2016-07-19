@@ -64,7 +64,7 @@
     };
     data1 = '';
     function loadMap() {
-      url1 = '/data/jsonToMap/' + idPath
+      url1 = 'jsonToMap/' + idPath
 
 //      var vectorLayer = new ol.layer.Vector({
 //        source: new ol.source.Vector({
@@ -98,7 +98,7 @@
 
 
     function llamadaAsynGeoJson() {
-      url = '/data/jsonToMap/' + idPath
+      url = 'data/jsonToMap/' + idPath
       $.get('url'), {
         data: {format: 'json'},
         success: function (datos) {
@@ -115,7 +115,7 @@
     $('#mapModal').on('show.bs.modal', function () {
       loadMap();
       $('#nodePath').append(idPath)
-      linkOf = "/data/downloadShp/" + idPath
+      linkOf = "downloadShp/" + idPath
       $('#linkToDownloadShp').attr("href", linkOf)
 //      llamadaAsynGeoJson();
 

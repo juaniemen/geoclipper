@@ -156,26 +156,42 @@
     });
 
     function gestionaSubmit(datos){
-      if(status == 'duplicatedTable') {
+      if(datos['status'] == 'duplicatedTable') {
         var dialogInstance = new BootstrapDialog();
         dialogInstance.setTitle('ERROR');
         dialogInstance.setMessage(datos['message']);
         dialogInstance.setType(BootstrapDialog.TYPE_DANGER);
         dialogInstance.open();
-      }else if(status == 'cannotClip'){
+      }else if(datos['status'] == 'cannotClip'){
         var dialogInstance = new BootstrapDialog();
         dialogInstance.setTitle('ERROR');
         dialogInstance.setMessage(datos['message']);
         dialogInstance.setType(BootstrapDialog.TYPE_DANGER);
         dialogInstance.open();
-      }else if(status == 'blankClip'){
+        $('#layerName').attr("value", "");
+        nodesToClip = new Array();
+        nodeAux = null;
+
+        // Seteo botones del clipper
+        $('#clearListSelected').hide();
+        $('#clipNow').hide();
+      }else if(datos['status'] == 'blankClip'){
         var dialogInstance = new BootstrapDialog();
         dialogInstance.setTitle('ERROR');
         dialogInstance.setMessage(datos['message']);
         dialogInstance.setType(BootstrapDialog.TYPE_WARNING);
         dialogInstance.open();
-      }else if('successClip'){
+        $('#layerName').attr("value", "");
+        nodesToClip = new Array();
+        nodeAux = null;
+
+        // Seteo botones del clipper
+        $('#clearListSelected').hide();
+        $('#clipNow').hide();
+      }else if(datos['status']=='successClip'){
         console.log(datos);
+
+        // Seteo contenido
         idPath = datos['table'];
         $('#content').prepend(datos['modal'])
         loadMap(datos['data']);
@@ -183,9 +199,16 @@
         $('#layerName').attr("value", "");
         nodesToClip = new Array();
         nodeAux = null;
+
+        // Seteo botones del clipper
         $('#clearListSelected').hide();
         $('#clipNow').hide();
+
+        // Seteo valores del modal
         $('#tree').treeview('enableAll', { silent: true });
+        $('#nodePath').append(idPath)
+        link = "downloadShp/" + datos['table']
+        $('#linkToDownloadShp').attr("href", link)
         $('#mapModal').modal('show')
 
       }
@@ -267,9 +290,6 @@
 
     $('#mapModal').on('show.bs.modal', function () {
       loadMap();
-      $('#nodePath').append(idPath)
-      link = "/data/downloadShp/" + idPath
-      $('#linkToDownloadShp').attr("href", link)
 
     });
 

@@ -138,8 +138,8 @@ module Clipper
   end
 
   def validate_table(name1, conn)
-    query_val = %Q[ALTER TABLE #{name1} ALTER COLUMN geom TYPE geometry(MultiPoint, 25830) USING ST_Multi(geom);]
-    conn.exec(query_val)
+    query_srid_unified = %Q[SELECT UpdateGeometrySRID('#{name1}','geom',25830);]
+    conn.exec(query_srid_unified)
   end
   # listaTablas = ["gmpsje_ambgeomorfo", "gmpsje_geofacies", "gmpsje_litologia"]
   # name = "geomofor_lito_paisaje"

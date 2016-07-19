@@ -12,6 +12,9 @@ gem 'uglifier', '>= 1.3.0'
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.1.0'
 
+# Comprimir shp para descarga
+gem 'rubyzip'
+
 gem 'font-awesome-rails'
 
 # Gema para la gestion de archivos - upload ...

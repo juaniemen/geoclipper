@@ -44,12 +44,17 @@ class FormUploader
     if (shp != nil && shp.filename != nil)
       empiezaAux = shp_name.starts_with?("aux")
       mayorDe100 = shp_name.length > 100
+      special = "?<>',?[]}{=-)(*&^%$#`~{}"
+      regex = /[#{special.gsub(/./){|char| "\\#{char}"}}]/
 
       if empiezaAux
         errors.add(:shp_name, "El nombre no puede empezar con aux")
       end
       if mayorDe100
         errors.add(:shp_name, "El nombre no puede superar los 100 caracteres")
+      end
+      if shp_name =~ regex
+        errors.add(:shp_name, "El nombre no puede contener caracteres especiales: ?<>',?[]}{=-)(*&^%$#`~{}")
       end
     end
 
@@ -137,7 +142,7 @@ class FormUploader
 
     puts("#{Rails.public_path}/uploads/form_uploader/#{shp_name}")
     listPath=recorreCarpeta("#{Rails.public_path}/uploads/form_uploader/#{shp_name}", "*.shp")
-    shp2script(listPath, 25830, 25830)
+    shp2script(listPath, self.datum, 25830)
     listScripts=recorreCarpeta("#{Rails.public_path}/scripts", "#{shp_name}.sql")
     script2pg(listScripts)
 
