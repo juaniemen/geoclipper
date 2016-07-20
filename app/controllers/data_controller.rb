@@ -101,16 +101,17 @@ class DataController < ApplicationController
     if File.exist?("#{path}")
       File.delete("#{path}")
     end
-    args = %Q(-f GeoJSON #{path} "PG:host=#{host} dbname=#{database} user=#{username} password=#{password}" -sql 'select * from #{shp_name1}')
+    args = %Q(-f GeoJSON #{path} "PG:host=#{host} dbname=#{database} user=#{username} password=#{password}" -sql 'select * from #{shp_name1}' -s_srs EPSG:25830 -t_srs EPSG:3857)
     instruction = "ogr2ogr " + args
     out = `#{instruction}`
     p out
     json = File.open("#{path}", "r")
-    if !json.nil?
+    jsonAux = json.read
+    if !jsonAux.nil?
       jsonFinal = {
           :status => :ok,
           :message => "Success!",
-          :data => json
+          :data => jsonAux
       }
     else
       jsonFinal = {
@@ -120,7 +121,7 @@ class DataController < ApplicationController
       }
     end
     respond_to do |format|
-      format.json { render json: json }
+      format.json { render json: jsonFinal }
     end
   end
 

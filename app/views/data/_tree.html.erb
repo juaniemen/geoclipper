@@ -48,84 +48,71 @@
 
     });
 
-    function loadMap2() {
+    function loadMap2(geojson) {
+      proj4.defs("EPSG:25830","+proj=utm +zone=30 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
+      proj4.defs("urn:ogc:def:crs:EPSG::25830","+proj=utm +zone=30 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
+
+      var vectorSource = new ol.source.Vector({
+        features: (new ol.format.GeoJSON()).readFeatures(geojson)
+      });
+
+      var vectorLayer = new ol.layer.Vector({
+        source: vectorSource
+      });
       var map = new ol.Map({
-        target: 'map',
+        target: 'map-canvas',
         layers: [
           new ol.layer.Tile({
             source: new ol.source.OSM()
-          })
+          }), vectorLayer
         ],
         view: new ol.View({
-          center: ol.proj.fromLonLat([37.41, 8.82]),
-          zoom: 4
+          center:[52.5243700 , 13.4105300],
+          zoom:2
+
         })
       });
     };
     data1 = '';
-    function loadMap() {
-      url1 = 'jsonToMap/' + idPath
-
-//      var vectorLayer = new ol.layer.Vector({
-//        source: new ol.source.Vector({
-//          format: new ol.format.GeoJSON(),
-//          url: url1
-//        }),
-//        style: new ol.style.Style({
-//          image: new ol.style.Circle( /** @type {olx.style.IconOptions} */ ({
-//            radius: 20,
-//            fill: new ol.style.Fill({
-//              color: '#ffff00'
-//            })
-//          }))
-//        })
-//      });
-
-      var map = new ol.Map({
-        target: 'map',
-        layers: [
-          new ol.layer.Tile({
-            source:  new ol.source.OSM({})
-          })
-        ],
-        view: new ol.View({
-          center: ol.proj.fromLonLat([37.41, 8.82]),
-          zoom: 4
-        })
-      });
-
-    };
 
 
     function llamadaAsynGeoJson() {
-      url = 'data/jsonToMap/' + idPath
-      $.get('url'), {
-        data: {format: 'json'},
-        success: function (datos) {
-          loadMap(datos);
-          alert('Me ha llegado')
-        },
-        error: function () {
-          alert('No se pudo cargar el mapa')
-        }
-      };
+      url = '/data/jsonToMap'
 
+      $.ajax({
+        type: "POST",
+        url: url,
+        data: {shp_name: idPath},
+        success: function (data) {
+          console.log('Los datos vienen de vuelta');
+          loadMap2(JSON.parse(data['data']));
+        },
+        dataType: 'json'
+      });
     }
 
+
     $('#mapModal').on('show.bs.modal', function () {
-      loadMap();
       $('#nodePath').append(idPath)
       linkOf = "downloadShp/" + idPath
       $('#linkToDownloadShp').attr("href", linkOf)
-//      llamadaAsynGeoJson();
+
 
 
     });
 
+    $('#mapModal').on('shown.bs.modal', function () {
+      llamadaAsynGeoJson();
+
+
+
+    });
+
+
     $('#mapModal').on('hidden.bs.modal', function () {
 
 
-      $('#map').empty();
+      $('#map-canvas').empty();
       $('#nodePath').empty();
       $('#tree').treeview('unselectNode', [nodeAux, {silent: false}]);
       selectedNode = null;

@@ -5,7 +5,7 @@ Rails.application.routes.draw do
   get 'data/load'
   get 'data/new', to: 'data#new'
   post 'data/create', to: 'data#create'
-  get 'data/jsonToMap/:shp_name', to: 'data#jsonToMap'
+  post 'data/jsonToMap', to: 'data#jsonToMap'
   get 'data/clipper', to: 'data#clipper'
   post 'data/tables', to: 'data#tables'
   post 'data/listToClip', to: 'data#listToClip'

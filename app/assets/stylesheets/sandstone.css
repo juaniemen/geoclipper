@@ -40,7 +40,9 @@
     pointer-events: all;
 }
 
-#map {
-    height: 700px;
+#map-canvas {
+    height: 100%;
     width: 100%;
+    margin: 0px;
+    padding: 0px
 }
