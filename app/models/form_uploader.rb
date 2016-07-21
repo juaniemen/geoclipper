@@ -61,13 +61,32 @@ class FormUploader
 
   end
 
+  def existe_epsg?
+    result = false
+    config = Rails.configuration.database_configuration
+    host = config[Rails.env]["host"]
+    database = config[Rails.env]["database"]
+    username = config[Rails.env]["username"]
+    password = config[Rails.env]["password"]
+    connection_hash = {dbname: database, host: host, user: username, password: password}
+    conn = PG::Connection.new(connection_hash)
+
+    get_exists = %Q(SELECT * FROM spatial_ref_sys WHERE srid = '#{datum}')
+    fetching = conn.exec(get_exists)
+    if (fetching.ntuples() != 0)
+      result = true
+    end
+    result
+  end
+
   def validate_datum
     validates_presence_of :datum
     validates_numericality_of :datum
     out_of_range = datum.to_i.between?(2000, 32766)
-    if out_of_range == false
-      errors.add(:datum, "El srid debe estar entre 2000 y 32766")
+    if(!existe_epsg?)
+      errors.add(:datum, "El valor #{datum} no es un código EPSG válido")
     end
+
 
   end
 
@@ -145,12 +164,14 @@ class FormUploader
     shp2script(listPath, self.datum, 25830)
     listScripts=recorreCarpeta("#{Rails.public_path}/scripts", "#{shp_name}.sql")
     script2pg(listScripts)
-
+    if (existe_epsg?)
     if exist_table?(shp_name)
       return true
     else
       return false
     end
+    end
+    return false
   end
 
   def clean_form_uploder_directory

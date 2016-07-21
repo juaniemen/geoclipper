@@ -2,21 +2,23 @@
 
 </script>
 <!-- es como el root scope -->
+<%= render "data/modal" %>
 <%= render "data/modalForm" %>
 <div id="clipView">
-<div id="tree_div" class="col-sm-6 col-md-6 ">
+  <div id="tree_listSelected" class="col-sm-6 col-md-6">
+    <label class="control-label">Nombre de la nueva capa</label>
+    <input class="form-control" id="layerName" type="text">
+    <div class="list-group" id="listSelected">
+
+    </div>
+  </div>
+<div id="tree_div" class="col-sm-6 col-md-6 pull-right">
   <div id="tree">
     <!-- Seleccionar tablas para clipping -->
     <%= render "data/tree_clip", name: "Mapa de datos" %>
   </div>
 </div>
-<div id="tree_listSelected" class="col-sm-6 col-md-6 pull-right">
-  <label class="control-label">Nombre de la nueva capa</label>
-  <input class="form-control" id="layerName" type="text">
-  <div class="list-group" id="listSelected">
 
-  </div>
-</div>
   <br/>
   <br/>
   <br/>

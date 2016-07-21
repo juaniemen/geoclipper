@@ -16,6 +16,8 @@ class DataController < ApplicationController
     @uploader = FormUploader.new
   end
 
+
+
   def uploader_params
     params.require(:form_uploader).permit(:dbf, :shx, :shp, :temporality, :datum)
   end
@@ -24,7 +26,7 @@ class DataController < ApplicationController
     @tree_view = [create_tree_structure]
     @uploader = FormUploader.new(uploader_params)
     @uploader.id = 36
-    if !exists_table?
+    if !exists_table? && @uploader.existe_epsg?
       @uploader.save
       if @uploader.errors.blank? && exists_table?
         flash.alert = nil
@@ -32,13 +34,18 @@ class DataController < ApplicationController
             UPDATE #{@uploader.shp_name} SET temporal_context = to_date('#{@uploader.temporality}', 'mm-yyyy');])
         flash.notice = "SUCCESS: Los datos se han cargado correctamente"
         @uploader.clean_form_uploder_directory
+        @tree_view = [create_tree_structure]
       elsif @uploader.errors.blank?
         flash.alert = "DANGER: No se pudo completar la operación"
         @uploader.clean_form_uploder_directory
       end
-      render :new
+    elsif exists_table?
+      flash.alert = "WARNING: La tabla que desea cargar ya se encuentra en el sistema"
+    elsif !@uploader.existe_epsg?
+      flash.alert = "DANGER: El código EPSG que ha introducido no es válido"
     end
 
+    render :new
   end
 
 
@@ -163,10 +170,12 @@ class DataController < ApplicationController
   end
 
   def clipNow
+
     dataAux = params['clipData']
     name = params['layerName']
     name.downcase!
 
+    if validate_name_return_message(name) == nil
     existsTableBefore = exists_table_by_name?(name)
     if (!existsTableBefore)
       # Los datos no vienen como array si no como un hash cuyos indices son los números de un array lógico
@@ -228,20 +237,46 @@ class DataController < ApplicationController
       existsTableAfter = exists_table_by_name?(name)
 
     end
-    if (existsTableBefore)
-      finalResponse = {status: 'duplicatedTable', message: "Ya existe una tabla con ese nombre"}
+  end
+
+    if(validate_name_return_message(name) != nil)
+      finalResponse = {status: 'badName', message: validate_name_return_message(name)}
+    elsif (existsTableBefore)
+      finalResponse = {status: 'duplicatedTable', message: 'Ya existe una tabla con ese nombre'}
     elsif ((existsTableBefore && !existsTableAfter) || errorDataB)
-      finalResponse = {status: 'databaseError', message: "Ha habido un error con la base de datos. Contacte con el administrador"}
+      finalResponse = {status: 'databaseError', message: 'Ha habido un error con la base de datos. Contacte con el administrador'}
     elsif (blankTable?(name))
-      finalResponse = {status: 'blankTable', message: "La tabla resultante está vacía"}
+      finalResponse = {status: 'blankTable', message: 'La tabla resultante está vacía'}
     elsif (existsTableAfter)
-      finalResponse = {status: 'successClip', message: "La nueva capa ha sido generada correctamente", data: jsonToMapHelped(name), modal: (render_to_string partial: '/data/modal'), table: name}
+      finalResponse = {status: 'successClip', message: 'La nueva capa ha sido generada correctamente', data: jsonToMapHelped(name), table: name}
     end
 
     respond_to do |format|
       format.json { render json: finalResponse }
     end
 
+  end
+
+  def validate_name_return_message(name)
+      empiezaAux = name.starts_with?("aux")
+      mayorDe100 = name.length > 100
+      special = "?<>',?[]}{=-)(*&^%$#`~{}"
+      regex = /[#{special.gsub(/./){|char| "\\#{char}"}}]/
+
+      if (name == "" || name == nil)
+        message = "El nombre no puede estar vacío"
+      elsif empiezaAux
+        message =  "El nombre no puede empezar con aux"
+
+      elsif mayorDe100
+        message =  "El nombre no puede superar los 100 caracteres"
+
+      elsif name =~ regex
+        message =  "El nombre no puede contener caracteres especiales: ?<>',?[]}{=-)(*&^%$#`~{}"
+      else
+        message = nil
+      end
+    message
   end
 
   def downloadShp

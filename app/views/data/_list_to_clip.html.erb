@@ -3,7 +3,7 @@
     <% dataArray.each do |arrayObj| %>
         <div class="list-group-item pull" id="<%= nodeId %>">
             <span class="pull-right">
-              <a class="closeSelectedNode" href="#">×<input type="hidden" name="nodeId" value="<%= nodeId %>"/></a>
+              <a id="closeSelectedNode<%= nodeId %>" href="#">×<input type="hidden" name="nodeId" value="<%= nodeId %>"/></a>
             </span>
           <h3><%= arrayObj["table"] %></h3>
           <% if (arrayObj["properties"] != nil && arrayObj["properties"].length >1) %>
@@ -16,7 +16,7 @@
 <% end %>
 <script>
   $(document).ready(function () {
-    $('.closeSelectedNode').click(function () {
+    $("#closeSelectedNode<%= nodeId %>").click(function () {
       console.log(<%= nodeId.to_i %>);
       nodeToDeleteSelect = <%= nodeId %>;
       for (n = 0; n < nodesToClip.length; n++) {

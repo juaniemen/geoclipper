@@ -90,6 +90,7 @@
     };
 
     function ocultaRevelaBotones(){
+      longitudClip = nodesToClip.length
       if(longitudClip  >= 1){
         $('#clearListSelected').show()
         if(longitudClip >= 2){
@@ -116,7 +117,6 @@
           $('#listSelected').append(data['data']['htmlResponse']);
           nodesToClip.push({dataArray: dataArray, nodeId: selectToDelete});
           nodeAux = null;
-          longitudClip = nodesToClip.length
           ocultaRevelaBotones();
 
         },
@@ -156,45 +156,13 @@
     });
 
     function gestionaSubmit(datos){
-      if(datos['status'] == 'duplicatedTable') {
-        var dialogInstance = new BootstrapDialog();
-        dialogInstance.setTitle('ERROR');
-        dialogInstance.setMessage(datos['message']);
-        dialogInstance.setType(BootstrapDialog.TYPE_DANGER);
-        dialogInstance.open();
-      }else if(datos['status'] == 'cannotClip'){
-        var dialogInstance = new BootstrapDialog();
-        dialogInstance.setTitle('ERROR');
-        dialogInstance.setMessage(datos['message']);
-        dialogInstance.setType(BootstrapDialog.TYPE_DANGER);
-        dialogInstance.open();
-        $('#layerName').attr("value", "");
-        nodesToClip = new Array();
-        nodeAux = null;
-
-        // Seteo botones del clipper
-        $('#clearListSelected').hide();
-        $('#clipNow').hide();
-      }else if(datos['status'] == 'blankClip'){
-        var dialogInstance = new BootstrapDialog();
-        dialogInstance.setTitle('ERROR');
-        dialogInstance.setMessage(datos['message']);
-        dialogInstance.setType(BootstrapDialog.TYPE_WARNING);
-        dialogInstance.open();
-        $('#layerName').attr("value", "");
-        nodesToClip = new Array();
-        nodeAux = null;
-
-        // Seteo botones del clipper
-        $('#clearListSelected').hide();
-        $('#clipNow').hide();
-      }else if(datos['status']=='successClip'){
+      if(datos['status']=='successClip'){
         console.log(datos);
 
         // Seteo contenido
         idPath = datos['table'];
         $('#content').prepend(datos['modal'])
-        loadMap(datos['data']);
+        // No cargamos el mapa pues se hará al mostrar el modal
         $('#listSelected').empty();
         $('#layerName').attr("value", "");
         nodesToClip = new Array();
@@ -204,6 +172,7 @@
         $('#clearListSelected').hide();
         $('#clipNow').hide();
 
+
         // Seteo valores del modal
         $('#tree').treeview('enableAll', { silent: true });
         $('#nodePath').append(idPath)
@@ -211,7 +180,22 @@
         $('#linkToDownloadShp').attr("href", link)
         $('#mapModal').modal('show')
 
-      }
+      }else{
+          var dialogInstance = new BootstrapDialog();
+          dialogInstance.setTitle('ERROR');
+          dialogInstance.setMessage(datos['message']);
+          dialogInstance.setType(BootstrapDialog.TYPE_DANGER);
+          dialogInstance.open();
+          $('#layerName').attr("value", "");
+          nodesToClip = new Array();
+          nodeAux = null;
+
+          // Seteo botones del clipper
+          $('#clearListSelected').hide();
+          $('#clipNow').hide();
+          $('#tree').treeview('enableAll', {silent: true});
+
+        }
     }
     $('#clipNow').on('click', function () {
       datosParaSubmit = [];
@@ -228,6 +212,7 @@
           nodesToClip = new Array();
           nodeAux = null;
           gestionaSubmit(data);
+
         },
         error: function (data) {
           alert('No se ha podido clipear')
@@ -271,9 +256,6 @@
     }
 
     function loadMap2(geojson) {
-      proj4.defs("EPSG:25830","+proj=utm +zone=30 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
-      proj4.defs("urn:ogc:def:crs:EPSG::25830","+proj=utm +zone=30 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
-
       var vectorSource = new ol.source.Vector({
         features: (new ol.format.GeoJSON()).readFeatures(geojson)
       });
@@ -289,7 +271,7 @@
           }), vectorLayer
         ],
         view: new ol.View({
-          center:[52.5243700 , 13.4105300],
+          center:[40.2632613,-7.0127214],
           zoom:2
 
         })
@@ -314,7 +296,8 @@
     }
 
     $('#mapModal').on('show.bs.modal', function () {
-      loadMap();
+      linkOf = "downloadShp/" + idPath
+      $('#linkToDownloadShp').attr("href", linkOf)
 
     });
 
@@ -327,10 +310,9 @@
 
 
     $('#mapModal').on('hide.bs.modal', function () {
-
-
       $('#map').empty();
       $('#nodePath').empty();
+      location.reload()
 
     });
 

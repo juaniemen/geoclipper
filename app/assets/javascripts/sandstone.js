@@ -11,4 +11,5 @@
 
 //= require turbolinks
 //= require jquery.slick
+//= require balloon_hover
 

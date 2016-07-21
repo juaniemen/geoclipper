@@ -1,4 +1,4 @@
-<%= form_for @uploader, :url => url_for(:controller => 'data', :action => 'create'), html: { multipart: true, class: "horizontal"} do  |f| %>
+<%= form_for @uploader, :url => url_for(:controller => 'data', :action => 'create'), html: {multipart: true, class: "horizontal"} do |f| %>
     <% if @uploader.errors.any? %>
         <div id="error_explanation" class="alert alert-warning">
           <ul>
@@ -9,15 +9,20 @@
         </div>
     <% end %>
     <br>
+    <% epsg_help = "Código de identificación de Sistemas de Referencia de Coordenadas por la entidad EPSG. Click para ver los mas comunes." %>
+    <% link = "http://www.juntadeandalucia.es/medioambiente/site/rediam/menuitem.04dc44281e5d53cf8ca78ca731525ea0/?vgnextoid=2a412abcb86a2210VgnVCM1000001325e50aRCRD&lr=lang_es" %>
     <div class="field">
-      <%= f.label :datum %><br>
+      <%= f.label :datum, 'EPSG' %>
+      <a aria-hidden="true" target="_blank" href="<%= link %>">
+        <i title= "<%= epsg_help %>" id="epsg-help" class="fa fa-question-circle fa-2x" aria-hidden="false"></i>
+      </a><br>
       <%= f.text_field :datum, class: "form-control" %>
     </div>
     <br>
     <div class="field">
       <%= f.label :temporality %><br>
       <div class='input-group date controls' id='datepickerMonth' data-date-format="mm-yyyy">
-        <%= f.text_field :temporality, class: "form-control", placeholder: "mm-yyyy"  %>
+        <%= f.text_field :temporality, class: "form-control", placeholder: "mm-yyyy" %>
 
         <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span>
                 </span>
@@ -31,15 +36,15 @@
     <br>
     <div class="field">
       <%= f.label :dbf %><br>
-      <%= f.file_field :dbf, class: "fileInput"  %>
+      <%= f.file_field :dbf, class: "fileInput" %>
     </div>
     <br>
     <div class="field">
       <%= f.label :shx %><br>
-      <%= f.file_field :shx, class: "fileInput"  %>
+      <%= f.file_field :shx, class: "fileInput" %>
     </div>
     <br>
     <div class="actions">
-      <%= f.submit class: "submit"%>
+      <%= f.submit class: "btn btn-info" %>
     </div>
 <% end %>
