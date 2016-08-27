@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MD_Metadata>
+  <fileIdentifier>ESMMASIAGUA0063</fileIdentifier>
+  <identificationInfo>
+    <MD_DataIdentification>
+      <citation>
+        <CI_Citation>
+          <title>Ríos</title>
+          <alternateTitle />
+          <date>
+            <CI_Date>
+              <date>enero de 2004</date>
+              <dateType>publication</dateType>
+            </CI_Date>
+          </date>
+        </CI_Citation>
+      </citation>
+      <abstract>Capa de la red de drenaje generada a partir del MDT de celda 100 x100</abstract>
+      <credit />
+      <topicCategory />
+      <pointOfContact>
+        <CI_ResponsibleParty>
+          <individualName />
+          <organisationName>CEH. Centro de estudios Hidrográficos (Ministerio de Fomento / Ministerio de Agricultura, Alimentación y Medio Ambiente)</organisationName>
+          <positionName />
+          <contactInfo>
+            <CI_Contact>
+              <phone>
+                <CI_Telephone>
+                  <voice />
+                </CI_Telephone>
+              </phone>
+              <address>
+                <CI_Address>
+                  <electronicMailAddress>centrodeservicios@sia-marm.es</electronicMailAddress>
+                </CI_Address>
+              </address>
+            </CI_Contact>
+          </contactInfo>
+        </CI_ResponsibleParty>
+      </pointOfContact>
+      <resourceConstraints>
+        <MD_LegalConstraints>
+          <accessConstraints />
+          <useConstraints />
+        </MD_LegalConstraints>
+      </resourceConstraints>
+      <spatialRepresentationType>Vector</spatialRepresentationType>
+      <spatialResolution>
+        <equivalentScale>
+          <MD_RepresentativeFraction>
+            <denominator />
+          </MD_RepresentativeFraction>
+        </equivalentScale>
+        <MD_Resolution>
+          <distance>
+            <value />
+          </distance>
+        </MD_Resolution>
+      </spatialResolution>
+      <language>spa</language>
+      <extent>
+        <EX_Extent>
+          <geographicElement>
+            <EX_GeographicBoundingBox>
+              <westBoundLongitude>-9.2584590000000002</westBoundLongitude>
+              <eastBoundLongitude>3.2014860000000001</eastBoundLongitude>
+              <southBoundLatitude>36.027836999999998</southBoundLatitude>
+              <northBoundLatitude>43.750712999999998</northBoundLatitude>
+            </EX_GeographicBoundingBox>
+          </geographicElement>
+        </EX_Extent>
+      </extent>
+    </MD_DataIdentification>
+  </identificationInfo>
+  <referenceSystemInfo>
+    <MD_CRS>
+      <referenceSystemIdentifier>
+        <RS_Identifier>
+          <code>ETRS89</code>
+        </RS_Identifier>
+      </referenceSystemIdentifier>
+    </MD_CRS>
+  </referenceSystemInfo>
+  <distributionInfo>
+    <MD_Distribution>
+      <distributionFormat>
+        <MD_Format>
+          <name>ESRI ShapeFile</name>
+        </MD_Format>
+      </distributionFormat>
+      <transferOptions>
+        <MD_DigitalTransferOptions>
+          <onLine>
+            <CI_OnlineResource>
+              <linkage />
+            </CI_OnlineResource>
+          </onLine>
+        </MD_DigitalTransferOptions>
+      </transferOptions>
+    </MD_Distribution>
+  </distributionInfo>
+  <metadataStandardName>ISO 19115 Geographic information - Metadata</metadataStandardName>
+  <metadataStandardVersion>2003</metadataStandardVersion>
+  <dateStamp>2016-05-01</dateStamp>
+</MD_Metadata>
+

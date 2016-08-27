@@ -1,0 +1,27 @@
+<script>
+    $('.smooth').on('click', function() {
+        $.smoothScroll({
+            scrollElement: $('body'),
+            scrollTarget: '#' + this.id
+        });
+
+        return false;
+    });
+</script>
+
+<div id="singlepagecontent">
+<div id="geoclipperpage">
+    <a id="whatsgeoclipper" class="smooth"></a>
+    About page content goes here.
+</div>
+
+<div id="aboutmepage">
+    <div class="cover" style="opacity: 0.5;">
+        <div class="cover-image" style="background-image : url('aboutme.jpg')">
+            <a id="aboutme" class="smooth"></a>
+
+
+        </div>
+    </div>
+</div>
+</div>

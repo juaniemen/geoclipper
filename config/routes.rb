@@ -1,8 +1,8 @@
 Rails.application.routes.draw do
 
 
-
-  get 'data/load'
+  get 'info', to: 'application#info'
+  get 'data/load', to: 'data#load'
   get 'data/new', to: 'data#new'
   post 'data/create', to: 'data#create'
   post 'data/jsonToMap', to: 'data#jsonToMap'
@@ -11,6 +11,8 @@ Rails.application.routes.draw do
   post 'data/listToClip', to: 'data#listToClip'
   post 'data/clipNow', to: 'data#clipNow'
   get 'data/downloadShp/:name', to: 'data#downloadShp'
+  get 'data/downloadCsv/:name', to: 'data#downloadCsv'
+  get 'data/remove/:name', to: 'data#remove'
 
   #############################
   # Rutas para error_controller

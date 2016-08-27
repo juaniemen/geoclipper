@@ -19,7 +19,7 @@ class DataController < ApplicationController
 
 
   def uploader_params
-    params.require(:form_uploader).permit(:dbf, :shx, :shp, :temporality, :datum)
+    params.require(:form_uploader).permit(:zip, :temporality, :datum)
   end
 
   def create
@@ -27,7 +27,10 @@ class DataController < ApplicationController
     @uploader = FormUploader.new(uploader_params)
     @uploader.id = 36
     if !exists_table? && @uploader.existe_epsg?
+      # begin
       @uploader.save
+      # rescue
+      # end
       if @uploader.errors.blank? && exists_table?
         flash.alert = nil
         @conn.exec(%Q[ALTER TABLE #{@uploader.shp_name} ADD COLUMN temporal_context DATE;
@@ -297,6 +300,39 @@ class DataController < ApplicationController
 
     `pgsql2shp -f #{Rails.public_path}/shp_to_download/#{name}/#{name}.shp -h #{host} -u #{username} -P #{password} #{database} "SELECT * FROM #{name};"`
     createAndSendZip(name)
+  end
+
+
+  def downloadCsv
+    name = params['name']
+    config = Rails.configuration.database_configuration
+    host = config[Rails.env]["host"]
+    database = config[Rails.env]["database"]
+    username = config[Rails.env]["username"]
+    password = config[Rails.env]["password"]
+
+
+    if !File.exist?("/postgres/#{name}.csv")
+      File.new("/postgres/#{name}.csv", "w+")
+    else
+      File.delete("/postgres/#{name}.csv")
+      File.new("/postgres/#{name}.csv", "w+")
+    end
+    File.chmod(0777, "/postgres/#{name}.csv")
+    shpToCSV = %Q(COPY #{name}
+    TO '/postgres/#{name}.csv'
+    DELIMITER ',' ESCAPE '"'
+    CSV HEADER;)
+    ActiveRecord::Base.connection.execute(shpToCSV)
+    # if File.exist?("#{Rails.public_path}/csv_to_download/#{name}.csv")
+      send_file "/postgres/#{name}.csv", type: 'text/csv'
+  end
+
+  def remove
+    name = params['name']
+    drop_if_exists = "drop table if exists #{name}"
+    @conn.exec(drop_if_exists)
+    render json: {removed: 'ok'}
   end
 end
 

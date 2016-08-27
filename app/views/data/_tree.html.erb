@@ -94,8 +94,9 @@
 
     $('#mapModal').on('show.bs.modal', function () {
       $('#nodePath').append(idPath)
-      linkOf = "downloadShp/" + idPath
-      $('#linkToDownloadShp').attr("href", linkOf)
+      $('#linkToDownloadShp').attr("href", "downloadShp/" + idPath)
+      $('#linkToRemove').attr("href", "remove/" + idPath)
+      $('#linkToDownloadCsv').attr("href", "downloadCsv/" + idPath)
 
 
 

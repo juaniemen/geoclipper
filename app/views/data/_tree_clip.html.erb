@@ -175,9 +175,17 @@
 
         // Seteo valores del modal
         $('#tree').treeview('enableAll', { silent: true });
-        $('#nodePath').append(idPath)
-        link = "downloadShp/" + datos['table']
-        $('#linkToDownloadShp').attr("href", link)
+        $('#nodePath').append(idPath);
+        $('#linkToDownloadShp').attr("href", "downloadShp/" + datos['table'])
+        $('#linkToRemove').click(function(){
+
+            $.get({
+          url: "downloadShp/" + datos['table'],
+          success: function(){$(location).attr('href', 'new')}
+        })
+        })
+
+        $('#linkToDownloadCsv').attr("href", "downloadCsv/" + datos['table'])
         $('#mapModal').modal('show')
 
       }else{
@@ -296,8 +304,9 @@
     }
 
     $('#mapModal').on('show.bs.modal', function () {
-      linkOf = "downloadShp/" + idPath
-      $('#linkToDownloadShp').attr("href", linkOf)
+      $('#linkToDownloadShp').attr("href", "downloadShp/" + idPath);
+      $('#linkToRemove').attr("href", "remove/" + idPath);
+      $('#linkToDownloadCsv').attr("href", "downloadCsv/" + idPath);
 
     });
 

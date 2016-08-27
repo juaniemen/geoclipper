@@ -1,9 +1,10 @@
 include ActiveModel::Validations
+include LoadData
+include Zip
 
 
 class FormUploader
   extend CarrierWave::Mount
-  include LoadData
   include PG
   include ActiveModel::Model
 
@@ -13,35 +14,21 @@ class FormUploader
   attr_accessor :datum
   attr_accessor :temporality
   # mount_uploaders :xlsxs, XlsxUploader
-  mount_uploader :shp, ShpUploader
-  mount_uploader :dbf, DbfUploader
-  mount_uploader :shx, ShxUploader
+  mount_uploader :zip, ZipUploader
 
   validate :validate_temporality,
            :validate_datum
 
 
   def shp_name
-    if (shp != nil && shp.filename != nil)
-      File.basename(shp.filename, File.extname(shp.filename))
-    end
-  end
-
-  def shx_name
-    if (shx != nil && shx.filename != nil)
-      File.basename(shx.filename, File.extname(shx.filename))
-    end
-  end
-
-  def dbf_name
-    if (dbf != nil && dbf.filename != nil)
-      File.basename(dbf.filename, File.extname(dbf.filename))
+    if (zip != nil && zip.filename != nil)
+      File.basename(zip.filename, File.extname(zip.filename))
     end
   end
 
   def validate_shp_name
     validates_presence_of :shp_name
-    if (shp != nil && shp.filename != nil)
+    if (zip != nil && zip.filename != nil)
       empiezaAux = shp_name.starts_with?("aux")
       mayorDe100 = shp_name.length > 100
       special = "?<>',?[]}{=-)(*&^%$#`~{}"
@@ -107,6 +94,7 @@ class FormUploader
     database = config[Rails.env]["database"]
     username = config[Rails.env]["username"]
     password = config[Rails.env]["password"]
+    port = 5432
     connection_hash = {dbname: database, host: host, user: username, password: password}
     conn = PG::Connection.new(connection_hash)
 
@@ -117,53 +105,58 @@ class FormUploader
     end
   end
 
-  def validate_xlsxs
 
-  end
 
-  def validate_dbf
-    if (exist_table?(dbf_name))
-      errors.add(:dbf, "DANGER: Ya existe ese archivo en la BD, utilice otro nombre (Renombrar)")
-    end
-  end
-
-  def validate_shp
+  def validate_zip
     if (exist_table?(shp_name))
-      errors.add(:shp, "DANGER: Ya existe ese archivo en la BD, utilice otro nombre (Renombrar)")
+      errors.add(:zip, "DANGER: Ya existe ese archivo en la BD, utilice otro nombre (Renombrar)")
     end
   end
 
-  def validate_shx
-    if (exist_table?(shx_name))
-      errors.add(:shx, "DANGER: Ya existe ese shapefile, utilice otro nombre (Renombrar)")
-    end
-  end
 
   def validate_files
+    validate :validate_zip
+  end
 
-    validate :validate_dbf
-    validate :validate_shp
-    validate :validate_shx
+  def descomprime_zip
+    Zip::File.open("#{Rails.public_path}/uploads/form_uploader/#{shp_name}.zip") do |zip_file|
 
+      zip_file.each do |entry|
+        # Extract to file/directory/symlink
 
-    if !((dbf_name == shp_name) and (dbf_name == shx_name))
-      errors.add([:dbf, :shp, :shx], "DANGER: El nombre de los archivos no es el mismo, reviselo")
+        puts "Extracting #{entry.name}"
+        unless File.exist?("#{Rails.public_path}/uploads/form_uploader/#{shp_name}")
+          FileUtils::mkdir_p("#{Rails.public_path}/uploads/form_uploader/#{shp_name}")
+        end
+        zip_file.extract(entry, "#{Rails.public_path}/uploads/form_uploader/#{entry.name}"){true}
+
+        puts "Extracted #{entry.name}"
+      end
     end
   end
 
   def save
 
-    self.store_shp!
-    self.store_shx!
-    self.store_dbf!
+    self.store_zip!
 
     validate validate_shp_name
 
+    self.descomprime_zip
     puts("#{Rails.public_path}/uploads/form_uploader/#{shp_name}")
+    config = Rails.configuration.database_configuration
+    host = config[Rails.env]["host"]
+    database = config[Rails.env]["database"]
+    username = config[Rails.env]["username"]
+    password = config[Rails.env]["password"]
+    port = 5432
+    connection_hash = {dbname: database, host: host, user: username, password: password, port: port}
     listPath=recorreCarpeta("#{Rails.public_path}/uploads/form_uploader/#{shp_name}", "*.shp")
-    shp2script(listPath, self.datum, 25830)
-    listScripts=recorreCarpeta("#{Rails.public_path}/scripts", "#{shp_name}.sql")
-    script2pg(listScripts)
+    listPath.each do |n|
+    inserta_datos(shp_name, n, connection_hash, datum)
+    end
+    # shp2script(listPath, self.datum, 25830)
+    # # listScripts=recorreCarpeta("#{Rails.public_path}/scripts", "#{shp_name}.sql")
+    # script2pg(listScripts)
     if (existe_epsg?)
     if exist_table?(shp_name)
       return true

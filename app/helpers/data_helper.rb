@@ -66,6 +66,8 @@ module DataHelper
         n3 = "#{Rails.public_path}/shp_to_download/#{name}/#{name}.prj"
         n4 = "#{Rails.public_path}/shp_to_download/#{name}/#{name}.shx"
 
+
+
         zipfile.add("#{name}/#{name}.shp", n1)
         zipfile.add("#{name}/#{name}.dbf", n2)
         zipfile.add("#{name}/#{name}.prj", n3)
