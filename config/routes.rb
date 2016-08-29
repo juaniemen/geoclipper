@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
 
 
-  get 'info', to: 'application#info'
+  get 'info', to: 'application#whatsgeoclipper'
   get 'data/load', to: 'data#load'
   get 'data/new', to: 'data#new'
   post 'data/create', to: 'data#create'
@@ -21,6 +21,7 @@ Rails.application.routes.draw do
   match "/423", :to => "errors#permission_denied", :via => :all
   match "/500", :to => "errors#internal_server_error", :via => :all
   match "/503", :to => "errors#service_down", :via => :all
+
 
 
 

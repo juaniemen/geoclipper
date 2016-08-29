@@ -8,20 +8,93 @@
         return false;
     });
 </script>
-
-<div id="singlepagecontent">
-<div id="geoclipperpage">
-    <a id="whatsgeoclipper" class="smooth"></a>
-    About page content goes here.
-</div>
-
-<div id="aboutmepage">
-    <div class="cover" style="opacity: 0.5;">
-        <div class="cover-image" style="background-image : url('aboutme.jpg')">
-            <a id="aboutme" class="smooth"></a>
-
-
-        </div>
+<%= stylesheet_link_tag "cover", :media => "all" %>
+  <div class="section cover" id="geoclipperpage">
+    <div class="cover-image" style="background-image : url('colorado-rocky-mountains-national-park-overview-of-the-tundra-landscape.jpg')"></div>
+    <div class="col-md-12 text-center">
+      <a href="data/new"><img class="center" src="/logo1.png" class="img-responsive"></a>
+      <a href="data/new"><img class="center" src="/logoname.png" class="img-responsive"></a>
+      <h2 contenteditable="true" style="font-size: 52px; color: black">¡Gestiona y clippea tus shapefiles!</h2>
+      <br>
+      <br>
     </div>
-</div>
-</div>
+  </div>
+  <div class="section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <img src="<%= asset_path('minimalista.png') %>"
+               class="img-responsive">
+        </div>
+        <div class="col-md-6">
+          <h1 class="text-primary">Interfaz minimalista</h1>
+          <h3>El desarrollo de la interfaz ha sido centrado en la usabilidad, por ello
+            hemos podido concentrar toda la funcionalidad en pocos pasos&nbsp;</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <h1 class="text-primary">Exporta y clippea tus shapefiles</h1>
+          <h3>Elabora una intersección en pocos pasos eligiendo cada uno de los atributos
+            del clip resultante. Exporta estos como shapefiles o en formato CSV.&nbsp;</h3>
+        </div>
+        <div class="col-md-6">
+          <img src="<%= asset_path('csvlogo.png') %>"
+               class="img-responsive">
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <img src="<%= asset_path('browsers.png') %>"
+               class="img-responsive">
+        </div>
+        <div class="col-md-6">
+          <h1 class="text-primary">Desde donde quieras</h1>
+          <h3>Almacena tus muestras y descárgalas donde quieras. Utilizando para ello
+            cualquier navegador.</h3>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <h1 class="text-center">Me ha quedado claro. ¡Llevame ya a la aplicación!</h1>
+          <hr>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div class="container">
+            <div class="row">
+              <div class="col-md-4"></div>
+              <div class="col-md-4">
+                <a href="data/new"><img src="/logo1.png" class="img-responsive"></a>
+                <a href="data/new"><img src="/logoname.png" class="img-responsive"></a>
+              </div>
+              <div class="col-md-4"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="section cover" id="aboutme">
+    <div class="cover-image" style="background-image : url('aboutme.jpg')"></div>
+    <div class="col-md-12 text-center">
+      <h2 contenteditable="true">Juan Francisco Nieto Mendoza</h2>
+      <h4 contenteditable="true">Desarrollador</h4>
+      <br>
+      <br>
+    </div>
+  </div>
+

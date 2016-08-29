@@ -26,24 +26,12 @@
 </head>
 <body>
 
-<div class="header" id="header">
-  <div class="row">
-    <%= render 'layouts/header' %>
-  </div>
-</div>
 
-<br/>
-<div id="contentApp">
         <%= yield %>
-  </div>
 
 
 
-<div class="footer" id="footer">
 
-  <%= render 'layouts/footer' %>
-
-</div>
 <%= javascript_include_tag "sandstone" %>
 <%= javascript_include_tag "dataView" %>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-treeview/1.2.0/bootstrap-treeview.min.js"></script>

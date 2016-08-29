@@ -19,6 +19,10 @@ class ApplicationController < ActionController::Base
       render template: 'errors/error_500', layout: 'layouts/application', status: 500
     end
 
+    def whatsgeoclipper
+      render 'info/infosinglepage', layout: 'layouts/template2'
+    end
+
 
 
     # Prevent CSRF attacks by raising an exception.
