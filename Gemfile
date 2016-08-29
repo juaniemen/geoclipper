@@ -87,7 +87,6 @@ group :development do
 end
 
 group :production do
-  # Access an IRB console on exception pages or by using <%= console %> in views
   gem 'unicorn'
   gem 'pg'
 end

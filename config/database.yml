@@ -17,8 +17,12 @@ development:
 # Do not set this db to the same as development or production.
 test:
   <<: *default
-  database: geoclipper-db/production
+  database: geoclipper-db/test
+  username: rails
+  password: rails
 
 production:
   <<: *default
   database: geoclipper-db/production
+  username: rails
+  password: rails
