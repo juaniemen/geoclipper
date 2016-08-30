@@ -325,13 +325,14 @@ class DataController < ApplicationController
     CSV HEADER;)
     ActiveRecord::Base.connection.execute(shpToCSV)
     # if File.exist?("#{Rails.public_path}/csv_to_download/#{name}.csv")
-      send_file "/postgres/#{name}.csv", type: 'text/csv'
+      send_file "/postgres/#{name}.csv", type: 'text/csv', disposition: 'attachment'
   end
 
   def remove
     name = params['name']
     drop_if_exists = "drop table if exists #{name}"
     @conn.exec(drop_if_exists)
+    flash.alert = "SUCCESS: La tabla #{name} ha sido borrada"
     render json: {removed: 'ok'}
   end
 end
