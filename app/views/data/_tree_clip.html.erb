@@ -229,7 +229,15 @@
 
         },
         error: function (data) {
-          alert('No se ha podido clipear')
+          var dialogInstance = new BootstrapDialog();
+          dialogInstance.setType(BootstrapDialog.TYPE_DANGER);
+          dialogInstance.setTitle('ERROR');
+          dialogInstance.setMessage('No se ha podido realizar la operación. Es posible que las geometrías sean incompatibles. \n' +
+              'Encontrará una tabla resultante en la pantalla de carga de datos pero no se corresponde con el clip. \n' +
+              '\n ' +
+              'Si estos problemas persisten, contacte con el administrador');
+          dialogInstance.open();
+
         }
       });
     });
