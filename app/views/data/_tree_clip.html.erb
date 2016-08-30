@@ -179,10 +179,16 @@
         $('#linkToDownloadShp').attr("href", "downloadShp/" + datos['table'])
         $('#linkToRemove').click(function(){
 
-            $.get({
-          url: "downloadShp/" + datos['table'],
-          success: function(){$(location).attr('href', 'new')}
-        })
+            $.ajax({
+              type: "GET",
+          url: "remove/" + datos['table'],
+          success: function(data){
+
+            var dialogInstance = new BootstrapDialog();
+            dialogInstance.setTitle('SUCCESS');
+            dialogInstance.setMessage('La capa se ha eliminado correctamente');
+          }
+        });
         })
 
         $('#linkToDownloadCsv').attr("href", "downloadCsv/" + datos['table'])

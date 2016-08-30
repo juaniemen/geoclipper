@@ -332,8 +332,8 @@ class DataController < ApplicationController
     name = params['name']
     drop_if_exists = "drop table if exists #{name}"
     @conn.exec(drop_if_exists)
-    flash.alert = "SUCCESS: La tabla #{name} ha sido borrada"
-    render json: {removed: 'ok'}
+
+    redirect_to  "/data/new"
   end
 end
 
