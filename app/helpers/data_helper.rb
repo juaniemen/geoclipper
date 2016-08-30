@@ -80,7 +80,7 @@ module DataHelper
       #Send the data to the browser as an attachment
       #We do not send the file directly because it will
       #get deleted before rails actually starts sending it
-      send_data(zip_data, :type => 'application/zip', :filename => filename)
+      send_data(zip_data, :type => 'application/zip', :filename => filename, data: { turbolinks: false })
     ensure
       #Close and delete the temp file
       temp_file.close
