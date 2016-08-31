@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-
+  root 'application#whatsgeoclipper'
 
   get 'info', to: 'application#whatsgeoclipper'
   get 'data/load', to: 'data#load'
@@ -28,7 +28,7 @@ Rails.application.routes.draw do
 
 
 #   Ultima ruta para capturar todas
-#  get '*path' => "errors#not_found"
+get '*path' => "errors#not_found"
 
 
 
